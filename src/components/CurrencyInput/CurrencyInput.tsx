@@ -11,6 +11,7 @@ const inputBaseStyles = () => css`
   font-size: 24px;
   line-height: 32px;
   caret-color: #3388FF;
+  margin-bottom: 16px;
 `;
 
 const CurrencyInput: React.FC<any> = (props) => {

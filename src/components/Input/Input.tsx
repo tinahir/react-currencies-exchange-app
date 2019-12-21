@@ -5,6 +5,7 @@ import { css, jsx } from '@emotion/core';
 
 const inputBaseStyles = () => css`
   label: input;
+  background-color: transparent;
   border-width: 0;
   border-style: solid;
   width: 100%;

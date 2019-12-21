@@ -1,101 +1,120 @@
-import React from 'react';
-import styled from '@emotion/styled';
+import React, { useReducer, useEffect, useRef } from 'react';
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import IconButton from '../../components/IconButton';
+import { jsx } from '@emotion/core';
 
-const containerBaseStyles = () => css`
-  label: currencies-exchange__container;
-  display: block;
-  position: relative;
-  background-color: #eef0f2;
-  height: 100vh;
-  width: 768px;
-  margin: auto;
-`;
+import Select from '../../components/Select';
+import CurrencyInput from '../../components/CurrencyInput';
+import SwapIconSvg from '../../icons/SwapIcon';
+import currencies from '../../config/currencies.json';
+import {
+  SwapIcon,
+  TrandingIcon,
+  TrendingUpIcon,
+  CurrenciesContainer,
+  CurrencyCard,
+  CardCurrencySelect,
+  CardCurrencyInput,
+  CurrencyWhiteCard,
+} from './style';
+import { State, Action } from '../type';
+import Reducers from '../reducers';
+import ActionType from '../ActionType';
+import useApi from '../../hooks/useApi';
 
-const baseStyles = () => css`
-  label: card;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 300px;
-`;
+const options = new Array<{ label: string; value: string }>();
+for (let key of Object.keys(currencies)) {
+  options.push({
+    label: key,
+    value: key,
+  });
+}
 
-const FromCurrencyCard = styled('div')`
-  ${baseStyles};
-  background-color: white;
-`;
+const initialState: State = {
+  fromCode: 'USD',
+  toCode: 'EUR',
+  fromValue: '',
+  toValue: '',
+};
 
-const ToCurrencyCard = styled('div')`
-  ${baseStyles};
-`;
+function currencyReducer(state: State, action: Action): State {
+  return Reducers[action.type](state, action);
+}
 
-const SelectContainer = styled('div')`
-  ${containerBaseStyles};
-`;
+const CurrenciesExchange: React.FC<unknown> = () => {
+  const [state, dispatch] = useReducer(currencyReducer, initialState);
+  const [apiState, getExchangeRates] = useApi(
+    `http://localhost:3000/rates.json`
+  );
 
-const Icon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3388ff">
-    <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
-    <path d="M0 0h24v24H0z" fill="none" />
-  </svg>
-);
+  const execute = (type: ActionType, payload: string) => {
+    dispatch({ type, payload });
+  };
 
-const Icon2 = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="feather feather-trending-up"
-  >
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-    <polyline points="17 6 23 6 23 12"></polyline>
-  </svg>
-);
+  useEffect(() => {
+    getExchangeRates();
+    const timerId = setInterval(() => {
+      getExchangeRates();
+    }, 10000);
+    return () => {
+      clearInterval(timerId);
+    }
+  }, [state.fromCode, getExchangeRates]);
 
-const SwapIconStyles = () => css`
-  label: swap-icon;
-  position: absolute;
-  top: calc(300px - 26px);
-  left: 8px;
-  background-color: white;
-  border-width: 2px;
-  border-style: solid;
-  border-color: #eef0f2;
-  color: #3388ff;
-`;
-
-const TrandingIconStyles = () => css`
-  label: swap-icon;
-  position: absolute;
-  top: calc(300px - 26px);
-  left: calc(50% - 38px);
-  background-color: white;
-  border-width: 2px;
-  border-style: solid;
-  border-color: #eef0f2;
-  color: #3388ff;
-`;
-
-const CurrenciesExchange: React.FC<any> = () => {
   return (
-    <SelectContainer>
-      <IconButton css={SwapIconStyles}>
-        <Icon />
-      </IconButton>
-      <IconButton css={TrandingIconStyles}>
-        <Icon2 />
-      </IconButton>
-      <FromCurrencyCard />
-      <ToCurrencyCard />
-    </SelectContainer>
+    <CurrenciesContainer>
+      <SwapIcon>
+        <SwapIconSvg color="#3388ff" size="18" />
+      </SwapIcon>
+      <TrandingIcon label="$1 = 0.123450">
+        <TrendingUpIcon />
+      </TrandingIcon>
+      <CurrencyWhiteCard>
+        <CardCurrencySelect>
+          <Select
+            name="select"
+            options={options}
+            value={state.fromCode}
+            onChange={(e: any) => {
+              execute(ActionType.CHANGE_FROM_CURRENCY_CODE, e.target.value);
+            }}
+          ></Select>
+        </CardCurrencySelect>
+        <CardCurrencyInput>
+          <CurrencyInput
+            tabIndex="1"
+            autoFocus={true}
+            placeholder="0.00"
+            maxLength="14"
+            value={state.fromValue}
+            onChange={(e: any) => {
+              execute(ActionType.CHANGE_FROM_CURRENCY_VALUE, e.target.value);
+            }}
+          ></CurrencyInput>
+        </CardCurrencyInput>
+      </CurrencyWhiteCard>
+      <CurrencyCard>
+        <CardCurrencySelect>
+          <Select
+            name="select"
+            options={options}
+            value={state.toCode}
+            onChange={(e: any) => {
+              execute(ActionType.CHANGE_TO_CURRENCY_CODE, e.target.value);
+            }}
+          ></Select>
+        </CardCurrencySelect>
+        <CardCurrencyInput>
+          <CurrencyInput
+            placeholder="0.00"
+            maxLength="14"
+            value={state.toValue}
+            onChange={(e: any) => {
+              execute(ActionType.CHANGE_TO_CURRENCY_VALUE, e.target.value);
+            }}
+          ></CurrencyInput>
+        </CardCurrencyInput>
+      </CurrencyCard>
+    </CurrenciesContainer>
   );
 };
 

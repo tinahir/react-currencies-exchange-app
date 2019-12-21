@@ -1,4 +1,4 @@
-import React, { Children, cloneElement } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -7,7 +7,6 @@ const buttonStyles = () => css`
   label: icon-button;
   padding: 0;
   margin: 0;
-  display: inline-block;
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -30,25 +29,38 @@ const buttonStyles = () => css`
 
 const Button = styled('button')(buttonStyles);
 
-const Lable = styled.span`
+const Label = styled.span`
   width: 100%;
   display: flex;
 `;
+const Title = styled.span`
+  font-size: 16px;
+  padding: 0 8px;
+`;
 
-/**
- * Accessible icon button.
- */
-const IconButton: React.FC<any> = ({ children, ...props }) => {
+interface IIconButtonProps {
+  children: React.ReactNode;
+  label?: string;
+  onClick?: () => void;
+}
+
+const IconButton: React.FC<IIconButtonProps> = ({
+  children,
+  label,
+  ...props
+}) => {
   if (!children) {
     return null;
   }
 
   return (
     <Button type="button" {...props}>
-      <Lable>{children}</Lable>
+      <Label>
+        {children}
+        {label && <Title>{label}</Title>}
+      </Label>
     </Button>
   );
 };
-
 
 export default IconButton;
