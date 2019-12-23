@@ -1,19 +1,19 @@
 import React from 'react';
-import TextMaskInput from 'react-text-mask';
+import TextMaskInput, { maskArray } from 'react-text-mask';
 import Input from '../Input';
 
-interface IMaskedInputProps {}
+type MaskedInputProps = {
+  inputStyles: any;
+  type: string;
+  mask: (value: string) => maskArray;
+};
 
-const MaskedInput: React.FC<IMaskedInputProps> = props => (
+const MaskedInput: React.FC<MaskedInputProps> = props => (
   <TextMaskInput
     guide={false}
     {...props}
     render={(ref, { defaultValue, ...renderProps }) => (
-      <Input
-        value={defaultValue}
-        {...renderProps}
-        deepRef={ref}
-      />
+      <Input value={defaultValue} {...renderProps} deepRef={ref} />
     )}
   />
 );

@@ -14,7 +14,16 @@ const inputBaseStyles = () => css`
   margin-bottom: 16px;
 `;
 
-const CurrencyInput: React.FC<any> = ({ prefix, ...props }) => {
+type CurrencyInputProps = {
+  prefix?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  autoFocus?: boolean;
+  placeholder?: string;
+  maxLength?: string;
+  value: string;
+};
+
+const CurrencyInput = ({prefix ='', ...props }: CurrencyInputProps) => {
   return (
     <MaskedInput
       inputStyles={css([inputBaseStyles()])}

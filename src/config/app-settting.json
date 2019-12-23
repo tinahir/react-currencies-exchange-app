@@ -1,0 +1,6 @@
+{
+  "apiUrl": "https://api.exchangeratesapi.io/latest",
+  "defaultBaseCurrency": "EUR",
+  "defaultToCurrency": "CAD",
+  "currencyPollTime": 10000
+}

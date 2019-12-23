@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 import styled from '@emotion/styled';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -26,7 +26,12 @@ const InputElement = styled('input')`
   ${inputBaseStyles};
 `;
 
-const StyledInput: React.FC<any> = ({deepRef, inputStyles, ...props}) => {
+type InputProps = {
+  deepRef: RefObject<HTMLInputElement>;
+  inputStyles: any;
+}
+
+const Input = ({deepRef, inputStyles, ...props}: InputProps) => {
   return (
     <InputElement
       { ...{
@@ -37,7 +42,5 @@ const StyledInput: React.FC<any> = ({deepRef, inputStyles, ...props}) => {
     />
   )
 };
-
-const Input: React.FC  = props => <StyledInput {...props} />;
 
 export default Input;

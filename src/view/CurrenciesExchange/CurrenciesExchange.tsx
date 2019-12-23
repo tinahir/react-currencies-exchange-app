@@ -6,6 +6,7 @@ import Select from '../../components/Select';
 import CurrencyInput from '../../components/CurrencyInput';
 import SwapIconSvg from '../../icons/SwapIcon';
 import currencies from '../../config/currencies.json';
+import config from '../../config/app-settting.json';
 import {
   SwapIcon,
   TrandingIcon,
@@ -21,7 +22,7 @@ import useCurrencyExchange, {
 } from '../../hooks/useCurrencyExchange';
 
 const options = new Array<{ label: string; value: string }>();
-for (let key of Object.keys(currencies)) {
+for (let key of Object.keys(currencies).sort()) {
   options.push({
     label: key,
     value: key,
@@ -29,39 +30,45 @@ for (let key of Object.keys(currencies)) {
 }
 
 const CurrenciesExchange: React.FC<unknown> = () => {
-  const [{from, to, response}, getExchangeRates, dispatch] = useCurrencyExchange(
-    `http://localhost:3000/rates.json`
-  );
+  const [
+    { from, to, response },
+    getExchangeRates,
+    dispatch,
+  ] = useCurrencyExchange(config.apiUrl);
 
   const handleOnChange = (type: ActionTypes, payload: string) => {
     dispatch({ type, payload });
   };
 
   const getExchangeRate = () => {
-    return `$1 = $${response[to.code]}`;
+    let exchangeRate = response[to.code];
+    if (exchangeRate) {
+      return `${from.code} 1 = ${to.code} ${Number(response[to.code]).toFixed(4)}`;
+    }
+    return '';
   };
 
   const handleSwap = () => {
     dispatch({ type: ActionTypes.swapCurrency });
-  }
+  };
 
   useEffect(() => {
     getExchangeRates();
-    // const timerId = setInterval(() => {
-    //   getExchangeRates();
-    // }, 10000);
-    // return () => {
-    //   clearInterval(timerId);
-    // };
+    const timerId = setInterval(() => {
+      getExchangeRates();
+    }, config.currencyPollTime);
+    return () => {
+      clearInterval(timerId);
+    };
   }, [from.code, getExchangeRates]);
 
   return (
     <CurrenciesContainer>
       {console.log(from, to, response)}
-      <SwapIcon onClick={handleSwap}>
+      <SwapIcon tabIndex={-1} onClick={handleSwap}>
         <SwapIconSvg color="#3388ff" size="18" />
       </SwapIcon>
-      <TrandingIcon label={getExchangeRate()}>
+      <TrandingIcon tabIndex={-1} label={getExchangeRate()}>
         <TrendingUpIcon />
       </TrandingIcon>
       <CurrencyWhiteCard>
@@ -70,25 +77,18 @@ const CurrenciesExchange: React.FC<unknown> = () => {
             options={options}
             value={from.code}
             onChange={e => {
-              handleOnChange(
-                ActionTypes.changeFromCode,
-                e.target.value
-              );
+              handleOnChange(ActionTypes.changeFromCode, e.target.value);
             }}
           ></Select>
         </CardCurrencySelect>
         <CardCurrencyInput>
           <CurrencyInput
-            prefix="- "
-            tabIndex="1"
-            placeholder="0.00"
-            maxLength="16"
+            autoFocus={from.isFocused}
+            placeholder="0"
+            maxLength="15"
             value={from.value}
-            onChange={(e: any) => {
-              handleOnChange(
-                ActionTypes.changeFromValue,
-                e.target.value
-              );
+            onChange={e => {
+              handleOnChange(ActionTypes.changeFromValue, e.target.value);
             }}
           ></CurrencyInput>
         </CardCurrencyInput>
@@ -99,24 +99,18 @@ const CurrenciesExchange: React.FC<unknown> = () => {
             options={options}
             value={to.code}
             onChange={e => {
-              handleOnChange(
-                ActionTypes.changeToCode,
-                e.target.value
-              );
+              handleOnChange(ActionTypes.changeToCode, e.target.value);
             }}
           ></Select>
         </CardCurrencySelect>
         <CardCurrencyInput>
           <CurrencyInput
-            prefix="+ "
-            placeholder="0.00"
-            maxLength="16"
+            autoFocus={to.isFocused}
+            placeholder="0"
+            maxLength="15"
             value={to.value}
-            onChange={(e: any) => {
-              handleOnChange(
-                ActionTypes.changeToValue,
-                e.target.value
-              );
+            onChange={e => {
+              handleOnChange(ActionTypes.changeToValue, e.target.value);
             }}
           ></CurrencyInput>
         </CardCurrencyInput>

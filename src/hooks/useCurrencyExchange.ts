@@ -1,11 +1,13 @@
 import React from 'react';
 import { conformedCurrency } from '../components/CurrencyInput/CurrencyService';
+import config from '../config/app-settting.json';
 
 type Currency = {
   code: string;
   value: string;
   isFocused: boolean;
 };
+
 type State = {
   response: any;
   from: Currency;
@@ -30,12 +32,12 @@ export enum ActionTypes {
 const initialState: State = {
   response: [],
   from: {
-    code: 'USD',
+    code: config.defaultBaseCurrency,
     value: '',
     isFocused: true,
   },
   to: {
-    code: 'EUR',
+    code: config.defaultToCurrency,
     value: '',
     isFocused: false,
   },
@@ -65,6 +67,20 @@ const changeCurrencyValue = (
   return [value, toValue === 0 ? '' : toValue.toFixed(2)];
 };
 
+const updateCurrencyValues = (state: State): State => {
+  if (state.from.isFocused) {
+    return reducers[ActionTypes.changeFromValue](state, {
+      type: ActionTypes.changeFromValue,
+      payload: state.from.value,
+    });
+  } else {
+    return reducers[ActionTypes.changeToValue](state, {
+      type: ActionTypes.changeToValue,
+      payload: state.to.value,
+    });
+  }
+}
+
 const reducers = {
   [ActionTypes.swapCurrency]: (state: State, action: Action): State => {
     return { ...state, from: { ...state.to }, to: { ...state.from } };
@@ -75,7 +91,8 @@ const reducers = {
   },
   [ActionTypes.changeToCode]: (state: State, action: Action): State => {
     const [to, from] = changeCurrencyCode(action.payload, state.to, state.from);
-    return { ...state, from, to };
+    const newState = { ...state, from, to };
+     return updateCurrencyValues(newState);
   },
   [ActionTypes.changeFromValue]: (state: State, action: Action): State => {
     const exchangeRate = state.response[state.to.code];
@@ -91,7 +108,7 @@ const reducers = {
       from: { ...state.from, value: fromValue, isFocused: true },
       to: {
         ...state.to,
-        value: conformedCurrency(toValue, '+  ').conformedValue,
+        value: conformedCurrency(toValue).conformedValue,
         isFocused: false,
       },
     };
@@ -102,16 +119,14 @@ const reducers = {
       action.payload,
       exchangeRate,
       (value, exchangeRate) => {
-        return value === ''
-          ? 0
-          : Number(value.replace(/[^0-9.]/g, '')) / exchangeRate;
+        return Number(value.replace(/[^0-9.]/g, '')) / exchangeRate;
       }
     );
     return {
       ...state,
       from: {
         ...state.from,
-        value: conformedCurrency(fromValue, '- ').conformedValue,
+        value: conformedCurrency(fromValue).conformedValue,
         isFocused: true,
       },
       to: { ...state.to, value: toValue, isFocused: false },
@@ -122,20 +137,9 @@ const reducers = {
       ...state,
       response: action.payload,
     };
-
-    if (newState.from.isFocused) {
-      return reducers[ActionTypes.changeFromValue](newState, {
-        type: ActionTypes.changeFromValue,
-        payload: newState.from.value,
-      });
-    } else {
-      return reducers[ActionTypes.changeToValue](newState, {
-        type: ActionTypes.changeToValue,
-        payload: newState.to.value,
-      });
-    }
+    return updateCurrencyValues(newState);
   },
-  [ActionTypes.error]: (state: State, action: Action): State => {
+  [ActionTypes.error]: (state: State): State => {
     return {
       ...state,
       response: {},
@@ -143,9 +147,11 @@ const reducers = {
   },
 };
 
-const useCurrencyExchange = (
-  endpoint: string
-): [State, () => Promise<void>, React.Dispatch<Action>] => {
+const useCurrencyExchange = (endpoint: string): [
+  State,
+  () => Promise<void>,
+  React.Dispatch<Action>
+] => {
   const [state, dispatch] = React.useReducer(
     (state: State, action: Action): State => {
       console.log(action);
@@ -156,7 +162,7 @@ const useCurrencyExchange = (
 
   const makeRequest = React.useCallback(async () => {
     try {
-      const response = await fetch(endpoint);
+      const response = await fetch(`${endpoint}?base=${state.from.code}`);
       if (response.status === 200) {
         const data = await response.json();
         dispatch(success(data.rates));
@@ -166,7 +172,7 @@ const useCurrencyExchange = (
     } catch (e) {
       dispatch(error(e));
     }
-  }, [endpoint]);
+  }, [endpoint, state.from.code]);
 
   const success = (response: unknown) => ({
     type: ActionTypes.success,

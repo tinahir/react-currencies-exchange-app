@@ -7,6 +7,7 @@ export const numberMask = (prefix: string) =>
     suffix: '',
     thousandsSeparatorSymbol: ',',
     allowDecimal: true,
+    allowLeadingZeroes: true
   });
 
 export const conformedCurrency = (value: string, prefix = '') =>

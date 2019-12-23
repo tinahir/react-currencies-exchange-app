@@ -38,17 +38,18 @@ const Title = styled.span`
   padding: 0 8px;
 `;
 
-interface IIconButtonProps {
+type IconButtonProps = {
+  tabIndex?: number;
   children: React.ReactNode;
   label?: string;
   onClick?: () => void;
 }
 
-const IconButton: React.FC<IIconButtonProps> = ({
+const IconButton = ({
   children,
   label,
   ...props
-}) => {
+}: IconButtonProps) => {
   if (!children) {
     return null;
   }
