@@ -8,7 +8,14 @@ import {
   SelectIcon
 } from './style';
 
-const Select: React.FC<any> = ({ value, placeholder, options, children, ...props }) => {
+type SelectProps = {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  placeholder?: string;
+  options: Array<{ label: string; value: string }>;
+};
+
+const Select = ({ value, placeholder, options, ...props }: SelectProps) => {
   return (
     <SelectContainer>
       <SelectElement
@@ -22,8 +29,7 @@ const Select: React.FC<any> = ({ value, placeholder, options, children, ...props
             {placeholder}
           </option>
         )}
-        {children ||
-          (options &&
+        {(options &&
             options.map(({ label, ...rest }: { label: string; value: any }) => (
               <option key={rest.value} {...rest}>
                 {label}

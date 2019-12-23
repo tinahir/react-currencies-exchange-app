@@ -8,15 +8,11 @@ const MAX_CARD_HEIGHT = '150px';
 const ICON_BORDER_WIDTH = 3;
 const ICON_PADDING = 4;
 const ICON_HEIGHT = 18;
-const ICON_TOP  = ICON_BORDER_WIDTH + ICON_PADDING + (ICON_HEIGHT / 2);
+const ICON_TOP = ICON_BORDER_WIDTH + ICON_PADDING + ICON_HEIGHT / 2;
 
-const swapIconStyles = () => css`
-  label: swap-icon;
+const baseIconStyles = () => css`
   position: absolute;
-  top: calc(
-    ${MAX_CARD_HEIGHT} - ${ICON_TOP}px
-  );
-  left: 8px;
+  top: calc(${MAX_CARD_HEIGHT} - ${ICON_TOP}px);
   background-color: white;
   border-width: ${ICON_BORDER_WIDTH}px;
   border-style: solid;
@@ -25,27 +21,24 @@ const swapIconStyles = () => css`
   padding: ${ICON_PADDING}px;
 `;
 
+const swapIconStyles = () => css`
+  label: swap-icon;
+  left: 8px;
+`;
+
 export const SwapIcon = styled(IconButton)`
+  ${baseIconStyles}
   ${swapIconStyles}
 `;
 
 const trandingIconStyles = () => css`
   label: tranding-icon;
-  position: absolute;
-  top: calc(
-    ${MAX_CARD_HEIGHT} - ${ICON_TOP}px
-  );
-  left: calc(50% - ${ICON_TOP}px);
-  background-color: white;
-  border-width: ${ICON_BORDER_WIDTH}px;
-  border-style: solid;
-  border-color: #eef0f2;
-  color: #3388ff;
-  padding: ${ICON_PADDING}px;
+  left: calc(50% - ${ICON_BORDER_WIDTH + ICON_PADDING + 145 / 2}px);
   border-radius: 30px;
 `;
 
 export const TrandingIcon = styled(IconButton)`
+  ${baseIconStyles}
   ${trandingIconStyles}
 `;
 
