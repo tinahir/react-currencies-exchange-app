@@ -64,7 +64,6 @@ const CurrenciesExchange: React.FC<unknown> = () => {
 
   return (
     <CurrenciesContainer>
-      {console.log(from, to, response)}
       <SwapIcon tabIndex={-1} onClick={handleSwap}>
         <SwapIconSvg color="#3388ff" size="18" />
       </SwapIcon>

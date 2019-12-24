@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 import CurrenciesExchange from '../view/CurrenciesExchange';
 import config from '../config/app-settting.json';
@@ -21,32 +21,28 @@ test('show the default value of currencies', () => {
 
 });
 
-test('allow user update source currency value', () => {
-  const { getByDisplayValue, getAllByPlaceholderText } = render(
-    <CurrenciesExchange />
-  );
-});
-
-test('allow user update target currency value', () => {
-  const { getByDisplayValue, getAllByPlaceholderText } = render(
-    <CurrenciesExchange />
-  );
-});
-
 test('allow user update source currency code', () => {
-  const { getByDisplayValue, getAllByPlaceholderText } = render(
+  const { getByDisplayValue } = render(
     <CurrenciesExchange />
   );
+
+  const sourceCurrency = getByDisplayValue(config.defaultBaseCurrency) as HTMLSelectElement;
+  sourceCurrency.value = "USD";
+
+  expect(
+    (getByDisplayValue("USD") as HTMLSelectElement).value
+  ).toBe("USD");
 });
 
 test('allow user update target currency code', () => {
-  const { getByDisplayValue, getAllByPlaceholderText } = render(
+  const { getByDisplayValue } = render(
     <CurrenciesExchange />
   );
-});
 
-test('allow user swao source and taget currencies code anbd value', () => {
-  const { getByDisplayValue, getAllByPlaceholderText } = render(
-    <CurrenciesExchange />
-  );
+  const targetCurrency = getByDisplayValue(config.defaultToCurrency) as HTMLSelectElement;
+  targetCurrency.value = "GBP";
+
+  expect(
+    (getByDisplayValue("GBP") as HTMLSelectElement).value
+  ).toBe("GBP");
 });

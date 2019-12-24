@@ -154,7 +154,6 @@ const useCurrencyExchange = (endpoint: string): [
 ] => {
   const [state, dispatch] = React.useReducer(
     (state: State, action: Action): State => {
-      console.log(action);
       return reducers[action.type](state, action);
     },
     initialState
