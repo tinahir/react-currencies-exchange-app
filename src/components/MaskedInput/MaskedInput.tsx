@@ -8,7 +8,7 @@ type MaskedInputProps = {
   mask: (value: string) => maskArray;
 };
 
-const MaskedInput: React.FC<MaskedInputProps> = props => (
+const MaskedInput = (props: MaskedInputProps) => (
   <TextMaskInput
     guide={false}
     {...props}
