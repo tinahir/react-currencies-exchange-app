@@ -11,4 +11,4 @@
 - `yarn test` - Perform single run of unit tests in Chrome
 
 ## Note:
-- `If codesendbox didn't work try to update error component with adding orremoing the line, it will work
+- If codesendbox didn't work try to update error component with adding or remoing the line, it will work
