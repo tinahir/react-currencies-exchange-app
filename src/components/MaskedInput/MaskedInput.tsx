@@ -1,3 +1,4 @@
+import React from 'react';
 import TextMaskInput, { maskArray } from 'react-text-mask';
 import Input from '../Input';
 
