@@ -9,3 +9,6 @@
 ## NPM Scripts
 - `yarn start` - Run app on http://localhost:3000 with live reload
 - `yarn test` - Perform single run of unit tests in Chrome
+
+## Note:
+- If Codesendbok did not work try to update compoment which have error with adding or removing the line 
