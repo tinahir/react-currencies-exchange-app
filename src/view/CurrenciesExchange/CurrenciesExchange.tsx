@@ -78,7 +78,7 @@ const CurrenciesExchange: React.FC<unknown> = () => {
     const currentAmount = myCurrenciesBalance.get(from.code) || 0;
     const enterAmount = currencyToNumber(from.value);
     return (
-      currentAmount == 0 ||
+      currentAmount === 0 ||
       !from.value ||
       enterAmount === 0 ||
       enterAmount > currentAmount

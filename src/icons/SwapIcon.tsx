@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface  ISwapIconProp {
   color: string;
   size: string

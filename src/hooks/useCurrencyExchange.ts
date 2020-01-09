@@ -164,7 +164,7 @@ const reducers = {
     const fromAmout = myCurrenciesBalance.get(from.code) || 0;
     const enterAmount = currencyToNumber(from.value);
     if (
-      fromAmout == 0 ||
+      fromAmout === 0 ||
       !from.value ||
       enterAmount === 0 ||
       enterAmount > fromAmout
