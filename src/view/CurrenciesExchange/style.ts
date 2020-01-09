@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 
 import { ReactComponent as TrendingUpIconSvg } from '../../icons/trending-up.svg';
 import IconButton from '../../components/IconButton';
+import Button from '../../components/Button';
 
 const MAX_CARD_HEIGHT = '150px';
 const ICON_BORDER_WIDTH = 3;
@@ -60,11 +61,10 @@ const containerBaseStyles = () => css`
 const baseCardStyles = () => css`
   label: card;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
   height: ${MAX_CARD_HEIGHT};
   padding: 16px;
-  align-items: center;
+  justify-content: center;
 `;
 
 export const CurrenciesContainer = styled('div')`
@@ -87,4 +87,29 @@ export const CardCurrencySelect = styled('div')`
 
 export const CardCurrencyInput = styled('div')`
   flex: 1;
+`;
+
+export const CardItem = styled('div')`
+  label: carditem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+export const BalanceLable = styled('div')`
+  label: balance__lable;
+  font-size: 12px;
+  color: gray;
+  padding: 0 12px;
+`;
+
+export const ExchangeButonContainer = styled('div')`
+  margin: 0 32px;
+`;
+
+export const ExchangeButon = styled(Button)`
+  label: exchange__button;
+  border-radius: 25px;
 `;

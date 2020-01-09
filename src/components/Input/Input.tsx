@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import { RefObject } from 'react';
 import styled from '@emotion/styled';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';

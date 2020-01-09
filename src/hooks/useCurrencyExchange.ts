@@ -1,6 +1,9 @@
 import React from 'react';
-import { conformedCurrency } from '../components/CurrencyInput/CurrencyService';
 import config from '../config/app-settting.json';
+import {
+  formatCurrency,
+  currencyToNumber,
+} from '../components/CurrencyInput/CurrencyService';
 
 type Currency = {
   code: string;
@@ -12,6 +15,7 @@ type State = {
   response: any;
   from: Currency;
   to: Currency;
+  myCurrenciesBalance: Map<string, number>;
 };
 
 type Action = {
@@ -25,8 +29,16 @@ export enum ActionTypes {
   changeFromValue,
   changeToValue,
   swapCurrency,
+  exchangeCurrency,
   success,
   error,
+}
+
+const getDefaultCurrencyBalance = () => {
+  const myCurrenciesBalance = new Map<string, number>();
+  // Note: 1840 is my default currency amout
+  myCurrenciesBalance.set(config.defaultBaseCurrency, 1840);
+  return myCurrenciesBalance;
 }
 
 const initialState: State = {
@@ -41,6 +53,7 @@ const initialState: State = {
     value: '',
     isFocused: false,
   },
+  myCurrenciesBalance: getDefaultCurrencyBalance()
 };
 
 const changeCurrencyCode = (
@@ -79,7 +92,7 @@ const updateCurrencyValues = (state: State): State => {
       payload: state.to.value,
     });
   }
-}
+};
 
 const reducers = {
   [ActionTypes.swapCurrency]: (state: State, action: Action): State => {
@@ -92,7 +105,7 @@ const reducers = {
   [ActionTypes.changeToCode]: (state: State, action: Action): State => {
     const [to, from] = changeCurrencyCode(action.payload, state.to, state.from);
     const newState = { ...state, from, to };
-     return updateCurrencyValues(newState);
+    return updateCurrencyValues(newState);
   },
   [ActionTypes.changeFromValue]: (state: State, action: Action): State => {
     const exchangeRate = state.response[state.to.code];
@@ -100,7 +113,7 @@ const reducers = {
       action.payload,
       exchangeRate,
       (value, exchangeRate) => {
-        return Number(value.replace(/[^0-9.]/g, '')) * exchangeRate;
+        return currencyToNumber(value) * exchangeRate;
       }
     );
     return {
@@ -108,7 +121,7 @@ const reducers = {
       from: { ...state.from, value: fromValue, isFocused: true },
       to: {
         ...state.to,
-        value: conformedCurrency(toValue).conformedValue,
+        value: formatCurrency(toValue),
         isFocused: false,
       },
     };
@@ -119,14 +132,14 @@ const reducers = {
       action.payload,
       exchangeRate,
       (value, exchangeRate) => {
-        return Number(value.replace(/[^0-9.]/g, '')) / exchangeRate;
+        return currencyToNumber(value) / exchangeRate;
       }
     );
     return {
       ...state,
       from: {
         ...state.from,
-        value: conformedCurrency(fromValue).conformedValue,
+        value: formatCurrency(fromValue),
         isFocused: true,
       },
       to: { ...state.to, value: toValue, isFocused: false },
@@ -145,13 +158,43 @@ const reducers = {
       response: {},
     };
   },
+  [ActionTypes.exchangeCurrency]: (state: State): State => {
+    const { myCurrenciesBalance, from, to } = state;
+
+    const fromAmout = myCurrenciesBalance.get(from.code) || 0;
+    const enterAmount = currencyToNumber(from.value);
+    if (
+      fromAmout == 0 ||
+      !from.value ||
+      enterAmount === 0 ||
+      enterAmount > fromAmout
+    ) {
+      return state;
+    }
+
+    myCurrenciesBalance.set(
+      from.code,
+      fromAmout - currencyToNumber(from.value)
+    );
+
+    const toAmout = myCurrenciesBalance.get(to.code) || 0;
+    myCurrenciesBalance.set(
+      to.code,
+      toAmout + currencyToNumber(to.value)
+    );
+
+    return {
+      ...state,
+      from: { ...from, value: ''},
+      to: {...to, value: '' },
+      myCurrenciesBalance,
+    };
+  },
 };
 
-const useCurrencyExchange = (endpoint: string): [
-  State,
-  () => Promise<void>,
-  React.Dispatch<Action>
-] => {
+const useCurrencyExchange = (
+  endpoint: string
+): [State, () => Promise<void>, React.Dispatch<Action>] => {
   const [state, dispatch] = React.useReducer(
     (state: State, action: Action): State => {
       return reducers[action.type](state, action);

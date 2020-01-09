@@ -8,7 +8,6 @@ export const containerBaseStyles = () => css`
   label: select__container;
   display: block;
   position: relative;
-  margin-bottom: 16px;
 `;
 
 export const selectBaseStyles = () => css`
