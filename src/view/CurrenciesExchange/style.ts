@@ -107,9 +107,13 @@ export const BalanceLable = styled('div')`
 
 export const ExchangeButonContainer = styled('div')`
   margin: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const ExchangeButon = styled(Button)`
   label: exchange__button;
   border-radius: 25px;
+  max-width: 300px;
 `;
